@@ -25,6 +25,14 @@ Requires: qtaround = %{version}-%{release}
 QtAround library used to port the-vault to C++. Mostly consists of
 thin wrappers around Qt classes and standard Linux utilities.
 
+%package tests
+Summary:    Tests for qtaround
+License:    LGPLv2.1
+Group:      System Environment/Libraries
+Requires:   %{name} = %{version}-%{release}
+%description tests
+%summary
+
 %prep
 %setup -q
 
@@ -51,3 +59,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
+
+%files tests
+%defattr(-,root,root,-)
+/opt/tests/qtaround/*
