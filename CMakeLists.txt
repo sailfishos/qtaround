@@ -44,7 +44,18 @@ set(CMAKE_CXX_FLAGS
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+pkg_check_modules(COR cor REQUIRED)
+
+include_directories(
+  ${COR_INCLUDE_DIRS}
+)
+link_directories(
+  ${COR_LIBRARY_DIRS}
+)
+
 add_subdirectory(src)
+add_subdirectory(tests)
 
 configure_file(qtaround.pc.in qtaround.pc @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/qtaround.pc DESTINATION ${DST_LIB}/pkgconfig)

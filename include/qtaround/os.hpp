@@ -24,15 +24,35 @@ namespace os {
 class path
 {
 public:
+    static inline QString join()
+    {
+        return QString("");
+    }
+
     static inline QString join(QString const& a)
     {
         return a;
     }
 
+    // to be used by templates below
+    static QString join(QStringList);
+
+    template <typename ...A>
+    static QString join(QStringList data, QString const& a , A&& ...args)
+    {
+        return join(data << a, std::forward<A>(args)...);
+    }
+
     template <typename ...A>
     static QString join(QString const& a, QString const& b, A&& ...args)
     {
-        return join(QStringList({a, b}).join("/"), std::forward<A>(args)...);
+        return join(QStringList{a, b}, std::forward<A>(args)...);
+        //return join(QStringList({a, b}).join("/"), std::forward<A>(args)...);
+    }
+
+    static QString join(std::initializer_list<QString> data)
+    {
+        return join(QStringList(data));
     }
 
     static inline bool exists(QString const &p)
@@ -73,6 +93,28 @@ public:
     {
         return QFileInfo(p).fileName();
     }
+    static inline QString baseName(QString const &p)
+    {
+        return QFileInfo(p).baseName();
+    }
+    static inline QString suffix(QString const &p)
+    {
+        return QFileInfo(p).suffix();
+    }
+    static inline QString completeSuffix(QString const &p)
+    {
+        return QFileInfo(p).completeSuffix();
+    }
+    // applicable to existing paths only
+    static inline bool isSame(QString const &p1, QString const &p2)
+    {
+        return canonical(p1) == canonical(p2);
+    };
+    // applicable to existing paths only
+    static inline bool isSelf(QString const &p)
+    {
+        return isSame(dirName(p), p);
+    };
 
     static QStringList split(QString const &p);
 
@@ -183,6 +225,17 @@ QVariant du(QString const &path, QVariantMap &&options = map({{"summarize", true
             , {"one_filesystem", true}, {"block_size", "K"}}));
 double diskFree(QString const &path);
 QString mkTemp(QVariantMap &&options = QVariantMap());
+
+static inline QString getTemp()
+{
+    return QDir::tempPath();
+}
+
+template <typename ...A>
+static inline QString getTemp(A &&...args)
+{
+    return os::path::join(getTemp(), std::forward<A>(args)...);
+}
 
 }
 

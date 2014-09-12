@@ -9,25 +9,44 @@
 #include <qtaround/os.hpp>
 #include <qtaround/util.hpp>
 #include <qtaround/debug.hpp>
-
+#include <QDebug>
 namespace os {
 
 QStringList path::split(QString const &p)
 {
     auto parts = p.split('/');
-    auto len  = parts.size();
+    if (parts.size() > 1) {
 
-    if (len <= 1)
-        return parts;
+        if (parts[0] == "")
+            parts[0] = '/';
 
-    if (parts[0] == "")
-        parts[0] = '/';
+        auto end = std::remove_if
+            (++parts.begin(), parts.end()
+             , [](QString const &v) { return v == "";});
+        parts.erase(end, parts.end());
+    }
+    return std::move(parts);
+}
+
+QString path::join(QStringList parts)
+{
+    switch (parts.size()) {
+    case 0:
+        return "";
+    case 1:
+        return parts.front();
+    }
+    auto &p0 = parts.front();
+    if (p0 == "")
+        parts.pop_front();
+    else if (p0 == "/")
+        p0 = "";
 
     auto end = std::remove_if
-        (parts.begin(), parts.end(), [](QString const &v) {
-            return v == "";});
+        (++parts.begin(), parts.end()
+         , [](QString const &v) { return v == "" || v == "/";});
     parts.erase(end, parts.end());
-    return parts;
+    return parts.join("/");
 }
 
 bool path::isDescendent(QString const &p, QString const &other) {

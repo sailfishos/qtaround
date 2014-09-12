@@ -1,12 +1,3 @@
-pkg_check_modules(COR cor REQUIRED)
-
-include_directories(
-  ${COR_INCLUDE_DIRS}
-)
-link_directories(
-  ${COR_LIBRARY_DIRS}
-)
-
 set(CMAKE_AUTOMOC TRUE)
 
 add_library(qtaround SHARED

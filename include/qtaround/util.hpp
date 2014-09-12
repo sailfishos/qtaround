@@ -42,6 +42,12 @@ inline QString str(char const *v)
     return QString(v);
 }
 
+template <typename T, typename T2, typename ... A>
+QString str(T && v, T2 && v2, A &&...args)
+{
+    return str(std::forward<T>(v)) + str(std::forward<T2>(v2), std::forward<A>(args)...);
+}
+
 inline bool is(QVariant const &v)
 {
     return v.toBool();
