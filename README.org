@@ -1,0 +1,5 @@
+* qtaround
+
+C++ library providing miscelaneous handy wrappers around Qt
+classes/functionality. Initially it was created as the port of
+cutes-js to C++ to port (the-)vault to C++.
