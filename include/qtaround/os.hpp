@@ -21,108 +21,106 @@
 using subprocess::Process;
 
 namespace os {
-class path
+namespace path
 {
-public:
-    static inline QString join()
-    {
-        return QString("");
-    }
 
-    static inline QString join(QString const& a)
-    {
-        return a;
-    }
+inline QString join()
+{
+    return QString("");
+}
 
-    // to be used by templates below
-    static QString join(QStringList);
+inline QString join(QString const& a)
+{
+    return a;
+}
 
-    template <typename ...A>
-    static QString join(QStringList data, QString const& a , A&& ...args)
-    {
-        return join(data << a, std::forward<A>(args)...);
-    }
+// to be used by templates below
+QString join(QStringList);
 
-    template <typename ...A>
-    static QString join(QString const& a, QString const& b, A&& ...args)
-    {
-        return join(QStringList{a, b}, std::forward<A>(args)...);
-        //return join(QStringList({a, b}).join("/"), std::forward<A>(args)...);
-    }
+template <typename ...A>
+QString join(QStringList data, QString const& a , A&& ...args)
+{
+    return join(data << a, std::forward<A>(args)...);
+}
 
-    static QString join(std::initializer_list<QString> data)
-    {
-        return join(QStringList(data));
-    }
+template <typename ...A>
+QString join(QString const& a, QString const& b, A&& ...args)
+{
+    return join(QStringList{a, b}, std::forward<A>(args)...);
+    //return join(QStringList({a, b}).join("/"), std::forward<A>(args)...);
+}
 
-    static inline bool exists(QString const &p)
-    {
-        return QFileInfo(p).exists();
-    }
-    static inline QString canonical(QString const &p)
-    {
-        return QFileInfo(p).canonicalFilePath();
-    }
-    static inline QString relative(QString const &p, QString const &d)
-    {
-        return QDir(d).relativeFilePath(p);
-    }
-    static inline QString deref(QString const &p)
-    {
-        return QFileInfo(p).symLinkTarget();
-    }
-    static QString target(QString const &link);
+inline QString join(std::initializer_list<QString> data)
+{
+    return join(QStringList(data));
+}
 
-    static inline bool isDir(QString const &p)
-    {
-        return QFileInfo(p).isDir();
-    }
-    static inline bool isSymLink(QString const &p)
-    {
-        return QFileInfo(p).isSymLink();
-    }
-    static inline bool isFile(QString const &p)
-    {
-        return QFileInfo(p).isFile();
-    }
-    static inline QString dirName(QString const &p)
-    {
-        return QFileInfo(p).dir().path();
-    }
-    static inline QString fileName(QString const &p)
-    {
-        return QFileInfo(p).fileName();
-    }
-    static inline QString baseName(QString const &p)
-    {
-        return QFileInfo(p).baseName();
-    }
-    static inline QString suffix(QString const &p)
-    {
-        return QFileInfo(p).suffix();
-    }
-    static inline QString completeSuffix(QString const &p)
-    {
-        return QFileInfo(p).completeSuffix();
-    }
-    // applicable to existing paths only
-    static inline bool isSame(QString const &p1, QString const &p2)
-    {
-        return canonical(p1) == canonical(p2);
-    };
-    // applicable to existing paths only
-    static inline bool isSelf(QString const &p)
-    {
-        return isSame(dirName(p), p);
-    };
+inline bool exists(QString const &p)
+{
+    return QFileInfo(p).exists();
+}
+inline QString canonical(QString const &p)
+{
+    return QFileInfo(p).canonicalFilePath();
+}
+inline QString relative(QString const &p, QString const &d)
+{
+    return QDir(d).relativeFilePath(p);
+}
+inline QString deref(QString const &p)
+{
+    return QFileInfo(p).symLinkTarget();
+}
+QString target(QString const &link);
 
-    static QStringList split(QString const &p);
-
-    static bool isDescendent(QString const &p, QString const &other);
-
-private:
-
+inline bool isDir(QString const &p)
+{
+    return QFileInfo(p).isDir();
+}
+inline bool isSymLink(QString const &p)
+{
+    return QFileInfo(p).isSymLink();
+}
+inline bool isFile(QString const &p)
+{
+    return QFileInfo(p).isFile();
+}
+inline QString dirName(QString const &p)
+{
+    return QFileInfo(p).dir().path();
+}
+inline QString fileName(QString const &p)
+{
+    return QFileInfo(p).fileName();
+}
+inline QString baseName(QString const &p)
+{
+    return QFileInfo(p).baseName();
+}
+inline QString suffix(QString const &p)
+{
+    return QFileInfo(p).suffix();
+}
+inline QString completeSuffix(QString const &p)
+{
+    return QFileInfo(p).completeSuffix();
+}
+// applicable to existing paths only
+inline bool isSame(QString const &p1, QString const &p2)
+{
+    return canonical(p1) == canonical(p2);
 };
+// applicable to existing paths only
+inline bool isSelf(QString const &p)
+{
+    return isSame(dirName(p), p);
+};
+
+QStringList split(QString const &p);
+
+bool isDescendent(QString const &p, QString const &other);
+
+} // path
 
 int system(QString const &cmd, QStringList const &args = QStringList());
 

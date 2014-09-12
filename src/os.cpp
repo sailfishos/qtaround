@@ -12,7 +12,9 @@
 #include <QDebug>
 namespace os {
 
-QStringList path::split(QString const &p)
+namespace path {
+
+QStringList split(QString const &p)
 {
     auto parts = p.split('/');
     if (parts.size() > 1) {
@@ -28,7 +30,7 @@ QStringList path::split(QString const &p)
     return std::move(parts);
 }
 
-QString path::join(QStringList parts)
+QString join(QStringList parts)
 {
     switch (parts.size()) {
     case 0:
@@ -49,7 +51,7 @@ QString path::join(QStringList parts)
     return parts.join("/");
 }
 
-bool path::isDescendent(QString const &p, QString const &other) {
+bool isDescendent(QString const &p, QString const &other) {
     auto tested = split(canonical(p));
     auto pivot = split(canonical(other));
 
@@ -63,10 +65,12 @@ bool path::isDescendent(QString const &p, QString const &other) {
     return true;
 }
 
-QString path::target(QString const &link)
+QString target(QString const &link)
 {
     // TODO use c lstat+readlink
     return str(subprocess::check_output("readlink", {link})).split('\n')[0];
+}
+
 }
 
 int system(QString const &cmd, QStringList const &args)
