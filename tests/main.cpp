@@ -4,15 +4,16 @@
 #include <tut/tut_main.hpp>
 #include <tut/tut_macros.hpp>
 #include <iostream>
-
+#include <QCoreApplication>
 
 namespace tut
 {
     test_runner_singleton runner;
 }
 
-int main(int argc, const char *argv[])
+int main(int argc, char *argv[])
 {
+    QCoreApplication app(argc, argv);
     tut::console_reporter reporter;
     tut::runner.get().set_callback(&reporter);
     try

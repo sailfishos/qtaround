@@ -25,11 +25,28 @@ Requires: qtaround = %{version}-%{release}
 QtAround library used to port the-vault to C++. Mostly consists of
 thin wrappers around Qt classes and standard Linux utilities.
 
+%package dbus
+Summary: QtAround D-Bus wrappers
+Group: Development/Libraries
+Requires: qtaround = %{version}-%{release}
+BuildRequires: pkgconfig(Qt5DBus) >= 5.2.0
+%description dbus
+QtAround library: D-Bus wrappers
+
+%package dbus-devel
+Summary: QtAround D-Bus development files
+Group: Development/Libraries
+Requires: qtaround = %{version}-%{release}
+Requires: qtaround-dbus = %{version}-%{release}
+%description dbus-devel
+%{summary}
+
 %package tests
 Summary:    Tests for qtaround
 License:    LGPLv2.1
 Group:      System Environment/Libraries
 Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-dbus = %{version}-%{release}
 %description tests
 %summary
 
@@ -54,12 +71,29 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(-,root,root,-)
 %{_libdir}/pkgconfig/qtaround.pc
-%dir %{_includedir}/qtaround
-%{_includedir}/qtaround/*.hpp
+%{_includedir}/qtaround/debug.hpp
+%{_includedir}/qtaround/error.hpp
+%{_includedir}/qtaround/json.hpp
+%{_includedir}/qtaround/os.hpp
+%{_includedir}/qtaround/subprocess.hpp
+%{_includedir}/qtaround/sys.hpp
+%{_includedir}/qtaround/util.hpp
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%files dbus
+%defattr(-,root,root,-)
+%{_libdir}/libqtaround-dbus.so*
+
+%files dbus-devel
+%defattr(-,root,root,-)
+%{_libdir}/pkgconfig/qtaround-dbus.pc
+%{_includedir}/qtaround/dbus.hpp
 
 %files tests
 %defattr(-,root,root,-)
 /opt/tests/qtaround/*
+
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
+%post dbus -p /sbin/ldconfig
+%postun dbus -p /sbin/ldconfig

@@ -1,0 +1,9 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+libdir=${prefix}/@DST_LIB@
+includedir=${prefix}/include
+
+Name: qtaround-dbus
+Description: qtaround-dbus library
+Version: @VERSION@
+Libs: -lqtaround-dbus -L${libdir}
+Cflags: -I${includedir}

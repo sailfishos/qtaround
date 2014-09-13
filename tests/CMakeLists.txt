@@ -4,7 +4,7 @@ include_directories(${TUT_INCLUDES})
 find_package(Qt5Core REQUIRED)
 set(CMAKE_AUTOMOC TRUE)
 
-set(UNIT_TESTS os)
+set(UNIT_TESTS os dbus)
 set(TESTS_DIR /opt/tests/qtaround)
 
 MACRO(UNIT_TEST _name)
@@ -18,6 +18,18 @@ ENDMACRO(UNIT_TEST)
 foreach(t ${UNIT_TESTS})
   UNIT_TEST(${t})
 endforeach(t)
+
+# more for dbus tests
+
+find_package(Qt5DBus REQUIRED)
+qt5_use_modules(test_dbus Core DBus)
+#set_source_files_properties(DBus.Properties.xml PROPERTIES NO_NAMESPACE TRUE)
+#qt5_add_dbus_interface(SRC DBus.Properties.xml prop_interface)
+#add_library(testprop STATIC ${SRC})
+target_link_libraries(test_dbus
+  qtaround-dbus
+  #testprop
+  )
 
 configure_file(tests.xml.in tests.xml @ONLY)
 FILE(GLOB SH_FILES *.sh)
