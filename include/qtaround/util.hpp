@@ -89,7 +89,7 @@ inline QVariantList list(std::initializer_list<QVariant> data)
 inline QVariantMap map(QVariant const &v, bool check_type = true)
 {
     if (check_type && !hasType(v, QMetaType::QVariantMap))
-        error::raise({{"msg", "Need QVariantMap"}, {"value", v}});
+        qtaround::error::raise({{"msg", "Need QVariantMap"}, {"value", v}});
     return v.toMap();
 }
 
@@ -207,7 +207,7 @@ constexpr size_t count(Args &&...)
         return names[Struct<Id>::Index<i>::value];                      \
     }
 
-namespace debug {
+namespace qtaround { namespace debug {
 
 template <size_t N>
 struct StructDump
@@ -247,9 +247,9 @@ QDebug & operator <<(QDebug &d, Struct<FieldsT> const &v)
     return d;
 }
 
-}
+}}
 
-namespace util {
+namespace qtaround { namespace util {
 
 template <typename ResT, typename T, typename FnT>
 QList<ResT> map(FnT fn, QList<T> const &src)
@@ -315,7 +315,7 @@ typedef std::function<QVariant (QVariant const &
                                 , QVariant const &)> visitor_type;
 QVariant visit(visitor_type visitor, QVariant const &src, QVariant const &ctx);
 
-}
+}}
 
 #define UNIQUE_PTR(T) std::unique_ptr<T, void(*)(T*)>
 

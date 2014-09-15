@@ -4,6 +4,9 @@
 #include <tut/tut.hpp>
 #include <cor/util.hpp>
 
+namespace os = qtaround::os;
+namespace error = qtaround::error;
+
 namespace {
 
 struct RootDir

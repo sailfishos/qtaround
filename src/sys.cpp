@@ -13,7 +13,7 @@
 #include <QStringList>
 #include <QCoreApplication>
 
-namespace sys {
+namespace qtaround { namespace sys {
 QStringList command_line_options(QVariantMap const &options
                                  , string_map_type const &short_options
                                  , string_map_type const &long_options
@@ -195,4 +195,4 @@ std::unique_ptr<GetOpt> getopt(QVariantMap const &info, bool requireAll)
     return std::move(res);
 }
 
-}
+}}

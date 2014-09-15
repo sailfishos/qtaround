@@ -11,7 +11,7 @@
 #include <string>
 #include <iostream>
 
-namespace debug {
+namespace qtaround { namespace debug {
 
 namespace {
 
@@ -55,4 +55,4 @@ bool is_tracing_level(Level level)
     return current_level ? l >= current_level : false;
 }
 
-}
+}}

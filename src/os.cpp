@@ -10,7 +10,8 @@
 #include <qtaround/util.hpp>
 #include <qtaround/debug.hpp>
 #include <QDebug>
-namespace os {
+
+namespace qtaround { namespace os {
 
 namespace path {
 
@@ -383,4 +384,4 @@ QString mkTemp(QVariantMap &&options)
     return res.trimmed();
 }
 
-} // os
+}} // os

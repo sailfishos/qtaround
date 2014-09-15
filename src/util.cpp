@@ -12,7 +12,7 @@
 #include <QString>
 #include <QMap>
 
-namespace util {
+namespace qtaround { namespace util {
 
 namespace {
 
@@ -88,4 +88,4 @@ QVariant visit(visitor_type visitor, QVariant const &src, QVariant const &ctx)
 }
 
 
-}
+}}

@@ -14,13 +14,13 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
-namespace json {
+namespace qtaround { namespace json {
 
 QJsonObject read(QString const &);
 ssize_t write(QJsonObject const &, QString const &);
 ssize_t write(QVariantMap const &, QString const &);
 
-}
+}}
 
 namespace {
 

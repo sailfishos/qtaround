@@ -14,7 +14,7 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
-namespace json {
+namespace qtaround { namespace json {
 
 QJsonObject read(QString const &fname)
 {
@@ -34,4 +34,4 @@ ssize_t write(QVariantMap const &src, QString const &fname)
     return write(QJsonObject::fromVariantMap(src), fname);
 }
 
-}
+}}

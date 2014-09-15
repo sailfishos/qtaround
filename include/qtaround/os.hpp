@@ -18,11 +18,11 @@
 #include <QVariant>
 #include <QDateTime>
 
+namespace qtaround { namespace os {
+
 using subprocess::Process;
 
-namespace os {
-namespace path
-{
+namespace path {
 
 inline QString join()
 {
@@ -235,6 +235,6 @@ static inline QString getTemp(A &&...args)
     return os::path::join(getTemp(), std::forward<A>(args)...);
 }
 
-}
+}}
 
 #endif // _CUTES_OS_HPP_

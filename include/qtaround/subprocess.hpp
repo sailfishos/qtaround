@@ -13,7 +13,7 @@
 #include <QProcess>
 #include <QVariant>
 
-namespace subprocess {
+namespace qtaround { namespace subprocess {
 
 class Process : public QObject
 {
@@ -112,6 +112,6 @@ static inline int check_call(QString const &cmd, QStringList const &args)
     return check_call(cmd, args, QVariantMap());
 }
 
+}}
 
-}
 #endif // _CUTES_SUBPROCESS_HPP_

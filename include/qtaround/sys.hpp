@@ -12,7 +12,7 @@
 
 #include <QSet>
 
-namespace sys {
+namespace qtaround { namespace sys {
 
 QStringList command_line_options
 (QVariantMap const &options
@@ -31,6 +31,6 @@ public:
 
 std::unique_ptr<GetOpt> getopt(QVariantMap const &, bool requireAll = true);
 
-}
+}}
 
 #endif // _CUTES_SYS_HPP_

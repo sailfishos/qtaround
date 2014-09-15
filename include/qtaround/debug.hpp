@@ -14,7 +14,7 @@
 
 #include <memory>
 
-namespace debug {
+namespace qtaround { namespace debug {
 
 enum class Level { Debug = 1, Info, Warning, Error, Critical };
 
@@ -85,6 +85,6 @@ void critical(A&& ...args)
     print_ge(Level::Critical, std::forward<A>(args)...);
 }
 
-}
+}}
 
 #endif // _CUTES_DEBUG_HPP_

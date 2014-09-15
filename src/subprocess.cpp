@@ -11,7 +11,7 @@
 #include <qtaround/debug.hpp>
 #include <qtaround/util.hpp>
 
-namespace subprocess {
+namespace qtaround { namespace subprocess {
 
 void Process::start(QString const &cmd, QStringList const &args)
 {
@@ -148,4 +148,4 @@ int check_call(QString const &cmd, QStringList const &args
     return p.check_call(cmd, args, error_info);
 }
 
-}
+}}

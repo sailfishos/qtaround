@@ -12,7 +12,7 @@
 #include <QVariantMap>
 #include <QDebug>
 
-namespace error {
+namespace qtaround { namespace error {
 
 class Error : public std::exception
 {
@@ -54,6 +54,6 @@ void raise(T const &m1, T2 const &m2, A && ...args)
     raise(x, std::forward<A>(args)...);
 }
 
-}
+}}
 
 #endif // _CUTES_ERROR_HPP_
