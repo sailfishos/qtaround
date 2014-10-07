@@ -33,4 +33,5 @@ target_link_libraries(test_dbus
 
 configure_file(tests.xml.in tests.xml @ONLY)
 FILE(GLOB SH_FILES *.sh)
-install(PROGRAMS tests.xml ${SH_FILES} DESTINATION ${TESTS_DIR})
+install(PROGRAMS ${SH_FILES} DESTINATION ${TESTS_DIR})
+install(FILES tests.xml DESTINATION ${TESTS_DIR})
