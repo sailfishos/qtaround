@@ -319,12 +319,18 @@ QVariant visit(visitor_type visitor, QVariant const &src, QVariant const &ctx);
 
 #define UNIQUE_PTR(T) std::unique_ptr<T, void(*)(T*)>
 
+template <typename T>
+typename UNIQUE_PTR(T)::deleter_type get_qobject_deleter()
+{
+    return [](T *p) { p->deleteLater(); };
+}
+
 template <typename T, typename ... Args>
 UNIQUE_PTR(T) make_qobject_unique(Args &&...args)
 {
     return UNIQUE_PTR(T)
         (new T(std::forward<Args>(args)...)
-         , [](T *p) { p->deleteLater(); });
+         , get_qobject_deleter<T>());
 }
 
 template <typename T, typename ... Args>
@@ -332,19 +338,26 @@ std::shared_ptr<T> make_qobject_shared(Args &&...args)
 {
     return std::shared_ptr<T>
         (new T(std::forward<Args>(args)...)
-         , [](T *p) { p->deleteLater(); });
+         , get_qobject_deleter<T>());
 }
 
 template <typename T>
 std::shared_ptr<T> qobject_shared(T *p)
 {
-    return std::shared_ptr<T>(p, [](T *p) { p->deleteLater(); });
+    return std::shared_ptr<T>(p, get_qobject_deleter<T>());
 }
 
 template <typename T>
 std::shared_ptr<T> qobject_shared(UNIQUE_PTR(T) p)
 {
-    return std::shared_ptr<T>(p.release(), [](T *p) { p->deleteLater(); });
+    return std::shared_ptr<T>(p.release(), get_qobject_deleter<T>());
+}
+
+template <typename T>
+UNIQUE_PTR(T) qobject_box(T &&v)
+{
+    std::unique_ptr<T> p(new T(std::move(v)));
+    return p;
 }
 
 #endif // _CUTES_UTIL_HPP_
