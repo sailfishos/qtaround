@@ -11,6 +11,11 @@
 #include <qtaround/debug.hpp>
 #include <QDebug>
 
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <cor/util.hpp>
+#include <tuple>
+
 namespace qtaround { namespace os {
 
 namespace path {
@@ -383,5 +388,6 @@ QString mkTemp(QVariantMap &&options)
     auto res = str(subprocess::check_output("mktemp", args));
     return res.trimmed();
 }
+
 
 }} // os
