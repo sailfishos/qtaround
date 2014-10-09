@@ -35,3 +35,11 @@ configure_file(tests.xml.in tests.xml @ONLY)
 FILE(GLOB SH_FILES *.sh)
 install(PROGRAMS ${SH_FILES} DESTINATION ${TESTS_DIR})
 install(FILES tests.xml DESTINATION ${TESTS_DIR})
+
+# linking tests
+add_executable(test-linking qtaround-link-main.cpp qtaround-link-2.cpp)
+target_link_libraries(test-linking qtaround)
+qt5_use_modules(test-linking Core)
+add_executable(test-linking-dbus qtaround-dbus-link-main.cpp qtaround-dbus-link-2.cpp)
+target_link_libraries(test-linking-dbus qtaround qtaround-dbus)
+qt5_use_modules(test-linking-dbus Core DBus)

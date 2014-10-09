@@ -38,6 +38,7 @@ Summary: QtAround D-Bus development files
 Group: Development/Libraries
 Requires: qtaround = %{version}-%{release}
 Requires: qtaround-dbus = %{version}-%{release}
+Requires: qtaround-devel = %{version}-%{release}
 %description dbus-devel
 %{summary}
 
