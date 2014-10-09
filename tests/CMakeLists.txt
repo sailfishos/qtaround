@@ -4,7 +4,7 @@ include_directories(${TUT_INCLUDES})
 find_package(Qt5Core REQUIRED)
 set(CMAKE_AUTOMOC TRUE)
 
-set(UNIT_TESTS os dbus misc)
+set(UNIT_TESTS os dbus misc mt)
 set(TESTS_DIR /opt/tests/qtaround)
 
 MACRO(UNIT_TEST _name)

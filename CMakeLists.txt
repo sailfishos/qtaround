@@ -58,6 +58,10 @@ set(QTAROUND_DBUS_MOC_HEADERS
   ${CMAKE_SOURCE_DIR}/include/qtaround/dbus.hpp
 )
 
+set(QTAROUND_MOC_HEADERS
+  ${CMAKE_SOURCE_DIR}/include/qtaround/mt.hpp
+)
+
 add_subdirectory(src)
 add_subdirectory(tests)
 

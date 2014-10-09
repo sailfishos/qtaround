@@ -81,6 +81,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/qtaround/subprocess.hpp
 %{_includedir}/qtaround/sys.hpp
 %{_includedir}/qtaround/util.hpp
+%{_includedir}/qtaround/mt.hpp
 
 %files dbus
 %defattr(-,root,root,-)

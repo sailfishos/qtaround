@@ -1,7 +1,11 @@
 set(CMAKE_AUTOMOC TRUE)
 
+qt5_wrap_cpp(QTAROUND_MOC_SRC ${QTAROUND_MOC_HEADERS})
+
 add_library(qtaround SHARED
+  ${QTAROUND_MOC_SRC}
   debug.cpp os.cpp json.cpp sys.cpp subprocess.cpp util.cpp
+  mt.cpp
   )
 qt5_use_modules(qtaround Core)
 target_link_libraries(qtaround ${COR_LIBRARIES})
