@@ -7,7 +7,7 @@ Group: Development/Liraries
 URL: https://github.com/nemomobile/qtaround
 Source0: %{name}-%{version}.tar.bz2
 BuildRequires: cmake >= 2.8
-BuildRequires: pkgconfig(cor) >= 0.1.14
+BuildRequires: pkgconfig(cor) >= 0.1.16
 BuildRequires: pkgconfig(tut) >= 0.0.3
 BuildRequires: pkgconfig(Qt5Core) >= 5.2.0
 Requires(post): /sbin/ldconfig
