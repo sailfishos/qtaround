@@ -4,8 +4,14 @@
        <description>QtAround automatic tests</description>
        <set name="unit-tests" feature="qtaround tests">
            <description>Testing qtaround</description>
-           <case manual="false" name="unittests">
-               <step>cd @TESTS_DIR@ &amp;&amp; find -type f -name 'test_*' -exec {} \;</step>
+           <case manual="false" name="os">
+               <step>cd @TESTS_DIR@ &amp;&amp; ./test_os</step>
+           </case>
+           <case manual="false" name="dbus">
+               <step>cd @TESTS_DIR@ &amp;&amp; ./test_dbus</step>
+           </case>
+           <case manual="false" name="misc">
+               <step>cd @TESTS_DIR@ &amp;&amp; ./test_misc</step>
            </case>
        </set>
    </suite>
