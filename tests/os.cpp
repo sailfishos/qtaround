@@ -88,9 +88,27 @@ enum test_ids {
     tid_du
 };
 
+#define DQ "\""
+#define SQ "'"
+#define QDQ SQ DQ SQ
+#define QSQ DQ SQ DQ
+
 template<> template<>
 void object::test<tid_basic>()
 {
+    ensure_eq(AT, os::singleQuoted(""), "''");
+    ensure_eq(AT, os::singleQuoted("a"), "'a'");
+    ensure_eq(AT, os::singleQuoted("'"), QSQ);
+    ensure_eq(AT, os::singleQuoted("''"), QSQ QSQ);
+    ensure_eq(AT, os::singleQuoted("\"'"), QDQ QSQ);
+    ensure_eq(AT, os::singleQuoted("'\""), QSQ QDQ);
+    ensure_eq(AT, os::singleQuoted("a'"), "'a'" QSQ);
+    ensure_eq(AT, os::singleQuoted("'b"), QSQ "'b'");
+    ensure_eq(AT, os::singleQuoted("'c'"), QSQ "'c'" QSQ);
+    ensure_eq(AT, os::singleQuoted("d'd"), "'d'" QSQ "'d'");
+    ensure_eq(AT, os::singleQuoted("ee'"), "'ee'" QSQ);
+    ensure_eq(AT, os::singleQuoted("'ff"), QSQ "'ff'");
+
     auto home = os::home();
     ensure_ne(AT, home.size(), 0);
     ensure_eq(AT, home, os::environ("HOME"));

@@ -18,6 +18,36 @@
 
 namespace qtaround { namespace os {
 
+#define QS_(str) QStringLiteral(str)
+namespace {
+
+const QChar squote{QLatin1Char('\'')};
+const QChar bslash{QLatin1Char('\\')};
+const QString escaped_squote{QS_("\"'\"")};
+
+}
+
+QString singleQuoted(QString const &v)
+{
+    QStringList parts;
+    QStringRef ref(&v);
+
+    auto appendSquoted = [&parts](QStringRef const &ref) {
+        if (ref.length())
+            parts.push_back(squote + ref.toString() + squote);
+    };
+    for (auto pos = ref.indexOf(squote); pos != -1; pos = ref.indexOf(squote)) {
+        appendSquoted(ref.left(pos));
+        parts.push_back(escaped_squote);
+        ref = ref.mid(pos + 1);
+        if (!ref.length())
+            break;
+    }
+    if (ref.length())
+        appendSquoted(ref);
+    return parts.length() ? parts.join(QS_("")) : QS_("''");
+}
+
 namespace path {
 
 QStringList split(QString const &p)
@@ -200,11 +230,15 @@ QList<QVariantMap> mount()
 
 QString mountpoint(QString const &path)
 {
-    QStringList commands = {"df -P " + path, "tail -1", "awk '{ print $NF; }'"};
+    if (!path::exists(path))
+        return "";
+
+    QStringList commands = {"df -P " + singleQuoted(path)
+                            , "tail -1", "awk '{ print $NF; }'"};
     QStringList options = {"-c", commands.join(" | ")};
     auto data = subprocess::check_output("sh", options);
     auto res = str(data).split("\n")[0];
-    debug::info("Mountpoint for", path, "=", path);
+    debug::info("Mountpoint for", path, "=", res);
     return res;
 }
 
@@ -273,7 +307,7 @@ public:
 
     QVariantMap df()
     {
-        QStringList cmd_options = {"-c", "btrfs fi df " + path};
+        QStringList cmd_options = {"-c", "btrfs fi df " + singleQuoted(path)};
         auto out = str(subprocess::check_output("sh", cmd_options));
         auto data = filterEmpty(out.trimmed().split("\n"));
 
