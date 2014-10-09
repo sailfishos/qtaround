@@ -247,15 +247,16 @@ class FileLock
 public:
     FileLock(LockFileHandle &&from) : lock_(std::move(from)) {}
     //lock_ is movable only
+    void unlock() { lock_.reset(); }
 private:
     LockFileHandle lock_;
 };
 
 template <typename OnLocked>
-LockFileHandle tryLock(LockFileHandle &&locker, OnLocked fn)
+LockFileHandle tryLock(LockFileHandle &&locker, OnLocked fn, int timeout = 0)
 {
     if (locker) {
-        if (locker->tryLock()) {
+        if (locker->tryLock(timeout)) {
             fn(FileLock(std::move(locker)));
             return nullptr;
         }
@@ -264,10 +265,10 @@ LockFileHandle tryLock(LockFileHandle &&locker, OnLocked fn)
 }
 
 template <typename OnLocked>
-LockFileHandle tryLock(QString const &fileName, OnLocked fn)
+LockFileHandle tryLock(QString const &fileName, OnLocked fn, int timeout = 0)
 {
     LockFileHandle h{new QLockFile(fileName)};
-    return tryLock(std::move(h), fn);
+    return tryLock(std::move(h), fn, timeout);
 }
 
 }}
