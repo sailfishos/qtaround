@@ -54,6 +54,8 @@ link_directories(
   ${COR_LIBRARY_DIRS}
 )
 
+set(QTAROUND_DBUS_HEADERS ${CMAKE_SOURCE_DIR}/include/qtaround/dbus.hpp)
+
 add_subdirectory(src)
 add_subdirectory(tests)
 
