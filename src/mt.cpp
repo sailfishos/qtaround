@@ -49,6 +49,8 @@ public:
     bool postEvent(QEvent *);
     bool sendEvent(QEvent *);
 
+    bool quitSync(unsigned long timeout);
+
 private:
     std::shared_ptr<QObject> obj_;
 };
@@ -57,8 +59,7 @@ Actor::Actor(QObject *parent)
     : QObject(parent), impl_(new ActorImpl(this))
 {
     connect(impl_, &QThread::finished
-            , this, &Actor::finished
-            , Qt::DirectConnection);
+            , [this]() { this->finished(this); });
 }
 
 Actor::~Actor()
@@ -66,7 +67,13 @@ Actor::~Actor()
 
 void Actor::quit()
 {
-    impl_->quit();
+    if (impl_->isRunning())
+        impl_->quit();
+}
+
+bool Actor::quitSync(unsigned long timeout)
+{
+    return impl_->quitSync(timeout);
 }
 
 void Actor::create(qobj_ctor_type ctor, actor_callback_type cb, QObject *parent)
@@ -93,11 +100,7 @@ ActorImpl::~ActorImpl()
 {
     auto app = QCoreApplication::instance();
     if (app) {
-        if (isRunning())
-            quit();
-        if (QThread::currentThread() != this)
-            if (!wait(10000))
-                debug::warning("Timeout: no quit from thread!");
+        quitSync(10000);
     }
     if (obj_ && this != QThread::currentThread())
         debug::warning("Managed object is not deleted in a right thread Current:"
@@ -137,6 +140,20 @@ bool ActorImpl::sendEvent(QEvent *e)
     }
 }
 
+bool ActorImpl::quitSync(unsigned long timeout)
+{
+    if (!isRunning())
+        return true;
+
+    quit();
+    if (this != QThread::currentThread())
+        if (!wait(timeout)) {
+            debug::warning("Timeout on sync quit");
+            return false;
+        }
+    return true;
+}
+
 void ActorImpl::create(qobj_ctor_type ctor, actor_callback_type cb
                        , QObject *parent)
 {
@@ -163,4 +180,61 @@ ActorHandle ActorImpl::createSync(qobj_ctor_type ctor, QObject *parent)
     return result;
 }
 
+class AppExitMonitor : public QObject
+{
+    Q_OBJECT
+public:
+    AppExitMonitor(QCoreApplication *);
+    void insert(ActorHandle);
+private slots:
+    void beforeAppQuit();
+    void actorFinished(Actor*);
+private:
+    std::map<intptr_t, std::weak_ptr<Actor> > actors_;
+};
+
+static AppExitMonitor *monitor_;
+static std::once_flag monitor_once_;
+
+void deleteOnApplicationExit(ActorHandle h)
+{
+    auto app = QCoreApplication::instance();
+    std::call_once(monitor_once_, [app]() {
+            monitor_ = new AppExitMonitor(app);
+        });
+    monitor_->insert(h);
+}
+
+AppExitMonitor::AppExitMonitor(QCoreApplication *app)
+    : QObject(app)
+{
+    Q_ASSERT(app);
+    connect(app, SIGNAL(aboutToQuit())
+            , this, SLOT(beforeAppQuit()));
+}
+
+void AppExitMonitor::insert(ActorHandle p)
+{
+    auto id = reinterpret_cast<intptr_t>(p.get());
+    actors_.insert(std::make_pair(id, std::weak_ptr<Actor>(p)));
+    connect(p.get(), &Actor::finished, this, &AppExitMonitor::actorFinished);
+}
+
+void AppExitMonitor::actorFinished(Actor *p)
+{
+    auto id = reinterpret_cast<intptr_t>(p);
+    actors_.erase(id);
+}
+
+void AppExitMonitor::beforeAppQuit()
+{
+    for (auto &kv : actors_) {
+        auto actor = kv.second.lock();
+        if (actor)
+            actor->quitSync(10000); // random timeout
+    }
+}
+
 }}
+
+#include "mt.moc"

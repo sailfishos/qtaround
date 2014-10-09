@@ -41,9 +41,10 @@ public:
     bool postEvent(QEvent *);
     bool sendEvent(QEvent *);
     void quit();
+    bool quitSync(unsigned long timeout);
 
 signals:
-    void finished();
+    void finished(Actor*);
 
 private:
     friend class ActorImpl;
@@ -74,6 +75,7 @@ ActorHandle startActorSync
     return Actor::createSync(qobj_ctor, parent);
 }
 
+void deleteOnApplicationExit(ActorHandle);
 }}
 
 #endif // _QTAROUND_MT_HPP_
