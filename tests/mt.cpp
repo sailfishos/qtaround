@@ -73,13 +73,13 @@ void object::test<tid_actor>()
     auto main_thread = QThread::currentThread();
     decltype(main_thread) actor_thread = nullptr;
 
-    mt::AnyActorHandle actor;
+    mt::ActorHandle actor;
     std::mutex mutex;
     std::condition_variable cond;
     auto make_test = []() { return make_qobject_unique<Test>(); };
     do {
         std::unique_lock<std::mutex> l(mutex);
-        mt::startActor<Test>(make_test, [&](mt::AnyActorHandle a) {
+        mt::startActor<Test>(make_test, [&](mt::ActorHandle a) {
                 actor_thread = QThread::currentThread();
                 std::unique_lock<std::mutex> l(mutex);
                 actor = a;
@@ -94,7 +94,7 @@ void object::test<tid_actor>()
 
     std::condition_variable exit_cond;
     auto isExited = false;
-    QObject::connect(actor.get(), &QThread::finished, [&]() {
+    QObject::connect(actor.get(), &mt::Actor::finished, [&]() {
             std::unique_lock<std::mutex> l(mutex);
             isExited = true;
             exit_cond.notify_all();
