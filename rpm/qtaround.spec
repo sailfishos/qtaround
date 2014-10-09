@@ -72,6 +72,7 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(-,root,root,-)
 %{_libdir}/pkgconfig/qtaround.pc
+%{_libdir}/pkgconfig/qtaround-1.pc
 %{_includedir}/qtaround/debug.hpp
 %{_includedir}/qtaround/error.hpp
 %{_includedir}/qtaround/json.hpp

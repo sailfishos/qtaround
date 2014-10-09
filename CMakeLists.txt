@@ -60,9 +60,12 @@ add_subdirectory(src)
 add_subdirectory(tests)
 
 configure_file(qtaround.pc.in qtaround.pc @ONLY)
+configure_file(qtaround-1.pc.in qtaround-1.pc @ONLY)
 configure_file(qtaround-dbus.pc.in qtaround-dbus.pc @ONLY)
+
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/qtaround.pc
+  ${CMAKE_CURRENT_BINARY_DIR}/qtaround-1.pc
   ${CMAKE_CURRENT_BINARY_DIR}/qtaround-dbus.pc
   DESTINATION
   ${DST_LIB}/pkgconfig

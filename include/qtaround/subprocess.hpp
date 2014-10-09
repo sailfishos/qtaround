@@ -114,4 +114,8 @@ static inline int check_call(QString const &cmd, QStringList const &args)
 
 }}
 
+#ifdef QTAROUND_NO_NS
+namespace subprocess = qtaround::subprocess;
+#endif
+
 #endif // _CUTES_SUBPROCESS_HPP_

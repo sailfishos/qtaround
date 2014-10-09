@@ -272,4 +272,8 @@ LockFileHandle tryLock(QString const &fileName, OnLocked fn)
 
 }}
 
+#ifdef QTAROUND_NO_NS
+namespace os = qtaround::os;
+#endif
+
 #endif // _CUTES_OS_HPP_

@@ -22,6 +22,10 @@ ssize_t write(QVariantMap const &, QString const &);
 
 }}
 
+#ifdef QTAROUND_NO_NS
+namespace json = qtaround::json;
+#endif
+
 namespace {
 
 QVariant get(QJsonValue const &v)

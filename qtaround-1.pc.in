@@ -6,4 +6,4 @@ Name: qtaround
 Description: qtaround library
 Version: @VERSION@
 Libs: -lqtaround -L${libdir}
-Cflags: -I${includedir} -DQTAROUND_NO_NS
+Cflags: -I${includedir}

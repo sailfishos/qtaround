@@ -87,4 +87,8 @@ void critical(A&& ...args)
 
 }}
 
+#ifdef QTAROUND_NO_NS
+namespace debug = qtaround::debug;
+#endif
+
 #endif // _CUTES_DEBUG_HPP_

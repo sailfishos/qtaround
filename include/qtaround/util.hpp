@@ -360,4 +360,8 @@ UNIQUE_PTR(T) qobject_box(T &&v)
     return p;
 }
 
+#ifdef QTAROUND_NO_NS
+namespace util = qtaround::util;
+#endif
+
 #endif // _CUTES_UTIL_HPP_

@@ -57,4 +57,8 @@ void raise(T const &m1, T2 const &m2, A && ...args)
 
 }}
 
+#ifdef QTAROUND_NO_NS
+namespace error = qtaround::error;
+#endif
+
 #endif // _CUTES_ERROR_HPP_

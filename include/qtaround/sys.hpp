@@ -33,4 +33,8 @@ std::unique_ptr<GetOpt> getopt(QVariantMap const &, bool requireAll = true);
 
 }}
 
+#ifdef QTAROUND_NO_NS
+namespace sys = qtaround::sys;
+#endif
+
 #endif // _CUTES_SYS_HPP_
