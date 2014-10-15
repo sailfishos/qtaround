@@ -1,7 +1,6 @@
 /**
  * @file util.cpp
  * @brief Misc. helpful utilities
- * @author Denis Zalevskiy <denis.zalevskiy@jolla.com>
  * @copyright (C) 2014 Jolla Ltd.
  * @par License: LGPL 2.1 http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
  */
@@ -12,7 +11,25 @@
 #include <QString>
 #include <QMap>
 
-namespace qtaround { namespace util {
+namespace qtaround {
+
+namespace error {
+const char* Error::what() const noexcept(true)
+{
+    if (s.isEmpty())
+        s = dump(m);
+    return s.toUtf8();
+}
+
+QDebug operator << (QDebug dst, error::Error const &src)
+{
+    dst << src.m;
+    return dst;
+}
+
+}
+
+namespace util {
 
 namespace {
 

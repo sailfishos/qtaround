@@ -4,7 +4,7 @@ include_directories(${TUT_INCLUDES})
 find_package(Qt5Core REQUIRED)
 set(CMAKE_AUTOMOC TRUE)
 
-set(UNIT_TESTS os dbus)
+set(UNIT_TESTS os dbus misc)
 set(TESTS_DIR /opt/tests/qtaround)
 
 MACRO(UNIT_TEST _name)
@@ -33,4 +33,5 @@ target_link_libraries(test_dbus
 
 configure_file(tests.xml.in tests.xml @ONLY)
 FILE(GLOB SH_FILES *.sh)
-install(PROGRAMS tests.xml ${SH_FILES} DESTINATION ${TESTS_DIR})
+install(PROGRAMS ${SH_FILES} DESTINATION ${TESTS_DIR})
+install(FILES tests.xml DESTINATION ${TESTS_DIR})

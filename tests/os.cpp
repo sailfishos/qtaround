@@ -6,6 +6,7 @@
 
 namespace os = qtaround::os;
 namespace error = qtaround::error;
+using error::dump;
 
 namespace {
 
@@ -331,7 +332,12 @@ void object::test<tid_mountpoint>()
 {
     auto home = os::home();
     auto mp = os::mountpoint(home);
+    ensure_ne("There should be some mountpoint", mp.size(), 0);
     ensure(AT, os::path::isDescendent(home, mp));
+    auto s = os::stat(home, {{"fields", "m"}});
+    auto mp2 = s["mount_point"];
+    if (mp != "?")
+        ensure_eq("Should be the same mountpoint if it is not ?", mp2, mp);
 }
 
 template<> template<>

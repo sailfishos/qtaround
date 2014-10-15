@@ -46,14 +46,7 @@ QStringList strings(QString const &s, A &&...args)
     return QStringList(s) + strings(std::forward<A>(args)...);
 }
 
-template <typename T>
-QString dump(T && t)
-{
-    QString s;
-    QDebug d(&s);
-    d << t;
-    return s;
-}
+#define S_(...) strings(__VA_ARGS__).join(' ').toStdString()
 
 }
 

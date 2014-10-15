@@ -14,26 +14,27 @@
 
 namespace qtaround { namespace error {
 
+template <typename T>
+QString dump(T && t)
+{
+    QString s;
+    QDebug d(&s);
+    d << t;
+    return s;
+}
+
 class Error : public std::exception
 {
 public:
     Error(QVariantMap const &from) : m(from) {}
     virtual ~Error() noexcept(true) {}
-    virtual const char* what() const noexcept(true)
-    {
-        QString s;
-        QDebug(&s) << m;
-        return s.toUtf8();
-    }
+    virtual const char* what() const noexcept(true);
 
     QVariantMap m;
+    mutable QString s;
 };
 
-static inline QDebug operator << (QDebug dst, error::Error const &src)
-{
-    dst << src.m;
-    return dst;
-}
+QDebug operator << (QDebug dst, error::Error const &src);
 
 static inline void raise(QVariantMap const &m)
 {

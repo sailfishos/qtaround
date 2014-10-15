@@ -17,6 +17,10 @@
 #include <QString>
 #include <QVariant>
 #include <QDateTime>
+#include <QLockFile>
+
+#include <memory>
+
 
 namespace qtaround { namespace os {
 
@@ -233,6 +237,35 @@ template <typename ...A>
 static inline QString getTemp(A &&...args)
 {
     return os::path::join(getTemp(), std::forward<A>(args)...);
+}
+
+typedef std::unique_ptr<QLockFile> LockFileHandle;
+class FileLock
+{
+public:
+    FileLock(LockFileHandle &&from) : lock_(std::move(from)) {}
+    //lock_ is movable only
+private:
+    LockFileHandle lock_;
+};
+
+template <typename OnLocked>
+LockFileHandle tryLock(LockFileHandle &&locker, OnLocked fn)
+{
+    if (locker) {
+        if (locker->tryLock()) {
+            fn(FileLock(std::move(locker)));
+            return nullptr;
+        }
+    }
+    return std::move(locker);
+}
+
+template <typename OnLocked>
+LockFileHandle tryLock(QString const &fileName, OnLocked fn)
+{
+    LockFileHandle h{new QLockFile(fileName)};
+    return tryLock(std::move(h), fn);
 }
 
 }}
