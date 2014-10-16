@@ -11,8 +11,11 @@ set_target_properties(qtaround PROPERTIES
   )
 install(TARGETS qtaround DESTINATION ${DST_LIB})
 
+qt5_wrap_cpp(QTAROUND_DBUS_SRC ${QTAROUND_DBUS_HEADERS})
+
 add_library(qtaround-dbus SHARED
   dbus.cpp
+  ${QTAROUND_DBUS_SRC}
   )
 qt5_use_modules(qtaround-dbus Core DBus)
 target_link_libraries(qtaround ${COR_LIBRARIES})
