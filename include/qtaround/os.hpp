@@ -24,6 +24,8 @@
 
 namespace qtaround { namespace os {
 
+QString singleQuoted(QString const &);
+
 using subprocess::Process;
 
 namespace path {
