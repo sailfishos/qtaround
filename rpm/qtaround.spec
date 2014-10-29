@@ -48,6 +48,7 @@ License:    LGPLv2.1
 Group:      System Environment/Libraries
 Requires:   %{name} = %{version}-%{release}
 Requires:   %{name}-dbus = %{version}-%{release}
+Requires:   btrfs-progs
 %description tests
 %summary
 

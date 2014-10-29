@@ -49,7 +49,7 @@ public:
 
     int rc() const
     {
-        return is_error() ? -1111 : ps->exitCode();
+        return is_error() ? 254 : ps->exitCode();
     }
 
     qint64 write(QString const &data)
@@ -110,6 +110,14 @@ int check_call(QString const &cmd, QStringList const &args, QVariantMap const &)
 static inline int check_call(QString const &cmd, QStringList const &args)
 {
     return check_call(cmd, args, QVariantMap());
+}
+
+static inline Process start
+(QString const &name, QStringList const &args = QStringList{})
+{
+    Process ps;
+    ps.start(name, args);
+    return std::move(ps);
 }
 
 }}

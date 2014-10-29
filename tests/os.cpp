@@ -3,6 +3,11 @@
 #include "tests_common.hpp"
 #include <tut/tut.hpp>
 #include <cor/util.hpp>
+#include <cor/os.hpp>
+
+#include <atomic>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 namespace os = qtaround::os;
 namespace error = qtaround::error;
@@ -85,7 +90,8 @@ enum test_ids {
     tid_mountpoint,
     tid_stat,
     tid_diskFree,
-    tid_du
+    tid_du,
+    tid_open_lock
 };
 
 #define DQ "\""
@@ -412,6 +418,161 @@ void object::test<tid_du>()
     for (auto it = items.begin(); it != items.end(); ++it) {
         ensure(AT, os::path::isDescendent(it.key(), test_dir));
         ensure_ge(AT, it.value().toUInt(), 1);
+    }
+}
+
+template<> template<>
+void object::test<tid_open_lock>()
+{
+    static const auto name = os::getTemp("qtaround-test-lock");
+
+    // non-reenterable
+    static std::atomic<char> poll_err_count(ATOMIC_VAR_INIT(0));
+
+    using cor::posix::Pipe;
+    namespace os = qtaround::os;
+
+    // parent sends cookie to the forked child and expects incremented
+    // cookie back
+    auto to_child = Pipe::create(), from_child = Pipe::create();
+
+    auto child = [&]() {
+        auto in = cor::use<Pipe::Read>(to_child);
+        auto out = cor::use<Pipe::Write>(from_child);
+        int cookie = 5;
+
+        auto pollIn = [&in, &cookie]() {
+            auto ev = cor::poll(in, POLLIN | POLLPRI, 1000 * 5);
+            if ((ev & (POLLHUP | POLLERR)) || !ev) {
+                ++poll_err_count;
+                return false;
+            }
+            return cor::read(in, cookie) == sizeof(cookie);
+        };
+        auto write = [&out, &cookie]() {
+            return cor::write(out, cookie) == sizeof(cookie);
+        };
+
+        auto shouldNotLock = [&cookie]() {
+            bool is_locked = false;
+            auto got_unexpected_lock = [&is_locked](os::FileLock) {
+                is_locked = true;
+            };
+            auto res = os::tryLock(name, got_unexpected_lock);
+            if (!(!res || is_locked))
+                ++cookie;
+            return true;
+        };
+
+        auto shouldLock = [&cookie, &write, &pollIn]() {
+            bool is_locked = false;
+            auto got_expected_lock = [&](os::FileLock) {
+                is_locked = true;
+                ++cookie;
+                write();
+                // locked till parent allow to go
+                pollIn();
+            };
+            auto res = os::tryLock(name, got_expected_lock);
+            // if not locked parent should be notified /w the same cookie
+            if (!is_locked) {
+                write();
+                pollIn();
+            }
+            if (!res) ++cookie;
+            write();
+        };
+
+        if (pollIn()) shouldNotLock();
+        write();
+        if (pollIn()) shouldLock();
+    };
+
+    auto parent = [&]() {
+        auto in = cor::use<Pipe::Read>(from_child);
+        auto out = cor::use<Pipe::Write>(to_child);
+
+        auto delOnExit = cor::on_scope_exit([]() {
+                if (os::path::exists(name)) os::rm(name);
+            });
+
+        auto pollRead = [&in](std::string const &msg, int data) {
+            auto events = cor::poll(in, POLLIN | POLLPRI, 1000 * 5);
+            ensure_eq("Bad poll event:" + msg, events & (POLLHUP | POLLERR), 0);
+            ensure_ne("No reply:" + msg, events, 0);
+            int res = 0;
+            ensure_eq("Read:" + msg, cor::read(in, res), sizeof(res));
+            ensure_eq(msg, res, data);
+            return res;
+        };
+
+        auto lockChildCantLock = [&]() {
+            auto isLocked = false;
+            auto gotExpectedLock = [&isLocked, &out, &pollRead](os::FileLock) {
+                isLocked = true;
+                cor::write(out, 1);
+                pollRead("Child should not be able to lock", 2);
+            };
+            auto res = os::tryLock(name, gotExpectedLock);
+            ensure("Should get lock", isLocked);
+            ensure("Should get null locker", !res);
+        };
+
+        auto childLockParentLockLater = [&]() {
+            cor::write(out, 11);
+            pollRead("Child should be able to lock", 12);
+            auto shouldNotLock = []() {
+                auto gotUnexpectedLock = [](os::FileLock) {
+                    fail("Parent should not be able to lock");
+                };
+                auto locker = os::tryLock(name, gotUnexpectedLock);
+                ensure("Parent should get locker", !!locker);
+                return std::move(locker);
+            };
+            auto locker = shouldNotLock();
+            cor::write(out, 21);
+            pollRead("Child should release lock, child locker should be null", 22);
+            ensure("Locker should be available", !!locker);
+
+            auto isLocked = false;
+            auto gotExpectedLock = [&isLocked](os::FileLock) {
+                isLocked = true;
+            };
+            locker = os::tryLock(std::move(locker), gotExpectedLock);
+            ensure("Should get lock", isLocked);
+            ensure("Should get null locker", !locker);
+        };
+
+        lockChildCantLock();
+        childLockParentLockLater();
+    };
+
+    auto rc = ::fork();
+    ensure_ne("Can't fork", rc, -1);
+
+    auto wait_on_exit = [] () {
+        int child_status = 255;
+        int counter = 1000 * 5;
+        int rc;
+        while (!(rc = ::waitpid(-1, &child_status, WNOHANG))) {
+            if (rc == -1) return 100;
+            if (!--counter) return 101;
+            ::usleep(1000);
+        }
+
+        return child_status;
+    };
+
+    if (!rc)
+        child();
+    else {
+        try {
+            parent();
+        } catch (...) {
+            wait_on_exit();
+            throw;
+        }
+        ensure_eq("Bad child", wait_on_exit(), 0);
     }
 }
 

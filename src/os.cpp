@@ -307,9 +307,11 @@ public:
 
     QVariantMap df()
     {
-        QStringList cmd_options = {"-c", "btrfs fi df " + singleQuoted(path)};
-        auto out = str(subprocess::check_output("sh", cmd_options));
-        auto data = filterEmpty(out.trimmed().split("\n"));
+        bool isOk;
+        QStringList data;
+        std::tie(isOk, data) = fiDf();
+        if (!isOk)
+            return QVariantMap{};
 
         auto split_colon = [](QString const &l) { return l.split(":"); };
         auto name_fields = util::map<QStringList>(split_colon, data);
@@ -335,6 +337,8 @@ public:
         auto kb = bs / kb_bytes;
         auto total = kb * b;
         auto info = df();
+        // no btrfs exec
+        if (info.isEmpty()) return total;
 
         auto used = util::map<double>([](QString const &, QVariant const &v) {
                 auto get_used = [](QString const &k, QVariant const &v) {
@@ -347,6 +351,20 @@ public:
     }
 
 private:
+
+    std::tuple<bool, QStringList> fiDf()
+    {
+        QStringList cmd_options = {"-c", "btrfs fi df " + singleQuoted(path)};
+        auto ps = subprocess::start("sh", cmd_options);
+        ps.wait(-1);
+        if (!ps.rc()) {
+            auto out = str(ps.stdout());
+            return std::make_tuple(true, filterEmpty(out.trimmed().split("\n")));
+        } else {
+            return std::make_tuple(false, QStringList());
+        }
+    }
+
     static const size_t kb_bytes = 1024;
     QString path;
 };
