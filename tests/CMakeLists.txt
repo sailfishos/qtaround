@@ -1,18 +1,19 @@
 pkg_check_modules(TUT REQUIRED tut>=0.0.3)
 include_directories(${TUT_INCLUDES})
 
-find_package(Qt5Core REQUIRED)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC TRUE)
+find_package(Qt5Core REQUIRED)
 
+testrunner_project(qtaround)
 set(UNIT_TESTS os dbus misc mt)
-set(TESTS_DIR /opt/tests/qtaround)
 
 MACRO(UNIT_TEST _name)
   set(_exe_name test_${_name})
   add_executable(${_exe_name} main.cpp ${_name}.cpp)
   target_link_libraries(${_exe_name} qtaround ${COR_LIBRARIES})
   qt5_use_modules(${_exe_name} Core)
-  install(TARGETS ${_exe_name} DESTINATION ${TESTS_DIR})
+  testrunner_install(TARGETS ${_exe_name})
 ENDMACRO(UNIT_TEST)
 
 foreach(t ${UNIT_TESTS})
@@ -33,8 +34,7 @@ target_link_libraries(test_dbus
 
 configure_file(tests.xml.in tests.xml @ONLY)
 FILE(GLOB SH_FILES *.sh)
-install(PROGRAMS ${SH_FILES} DESTINATION ${TESTS_DIR})
-install(FILES tests.xml DESTINATION ${TESTS_DIR})
+testrunner_install(PROGRAMS ${SH_FILES})
 
 # linking tests
 add_executable(test-linking qtaround-link-main.cpp qtaround-link-2.cpp)

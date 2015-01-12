@@ -1,3 +1,5 @@
+%{!?cmake_install: %global cmake_install make install DESTDIR=%{buildroot}}
+
 Summary: QtAround library
 Name: qtaround
 Version: 0.0.0
@@ -7,7 +9,7 @@ Group: Development/Liraries
 URL: https://github.com/nemomobile/qtaround
 Source0: %{name}-%{version}.tar.bz2
 BuildRequires: cmake >= 2.8
-BuildRequires: pkgconfig(cor) >= 0.1.16
+BuildRequires: pkgconfig(cor) >= 0.1.17
 BuildRequires: pkgconfig(tut) >= 0.0.3
 BuildRequires: pkgconfig(Qt5Core) >= 5.2.0
 Requires(post): /sbin/ldconfig
@@ -48,7 +50,11 @@ License:    LGPLv2.1
 Group:      System Environment/Libraries
 Requires:   %{name} = %{version}-%{release}
 Requires:   %{name}-dbus = %{version}-%{release}
+%if %{undefined suse_version}
 Requires:   btrfs-progs
+%else
+Requires:   btrfsprogs
+%endif
 %description tests
 %summary
 
@@ -61,7 +67,7 @@ make %{?jobs:-j%jobs}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=%{buildroot}
+%cmake_install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
