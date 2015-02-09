@@ -333,6 +333,24 @@ UNIQUE_PTR(T) make_qobject_unique(Args &&...args)
          , get_qobject_deleter<T>());
 }
 
+template <typename T>
+UNIQUE_PTR(T) acquire_qobject_unique(T *p)
+{
+    return UNIQUE_PTR(T)(p, get_qobject_deleter<T>());
+}
+
+template <typename T>
+UNIQUE_PTR(T) null_qobject_unique()
+{
+    return acquire_qobject_unique<T>(nullptr);
+}
+
+template <typename To, typename From>
+UNIQUE_PTR(To) static_cast_qobject_unique(UNIQUE_PTR(From) from)
+{
+    return acquire_qobject_unique<To>(static_cast<To*>(from.release()));
+}
+
 template <typename T, typename ... Args>
 std::shared_ptr<T> make_qobject_shared(Args &&...args)
 {
@@ -351,6 +369,21 @@ template <typename T>
 std::shared_ptr<T> qobject_shared(UNIQUE_PTR(T) p)
 {
     return std::shared_ptr<T>(p.release(), get_qobject_deleter<T>());
+}
+
+template <typename T>
+std::shared_ptr<QObject> qobject_shared_cast
+(UNIQUE_PTR(T) p, typename std::enable_if
+ <std::is_convertible<T*, QObject*>::value>::type* = 0)
+{
+    return qobject_shared(static_cast<QObject*>(p.release()));
+}
+
+template <typename To, typename From>
+std::shared_ptr<To> static_cast_qobject_shared(UNIQUE_PTR(From) from)
+{
+    auto p = static_cast_qobject_unique<To>(from);
+    return qobject_shared(std::move(p));
 }
 
 template <typename T>
