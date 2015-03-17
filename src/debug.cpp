@@ -15,7 +15,7 @@ namespace qtaround { namespace debug {
 
 namespace {
 
-int current_level = static_cast<int>(Level::Error);
+int current_level = static_cast<int>(Level::Warning);
 std::mutex mutex;
 bool is_init = false;
 
