@@ -124,6 +124,24 @@ QString get(QVariant const &from)
     return from.toString();
 }
 
+template <typename T, typename I>
+static bool can_convert
+(I v, typename std::enable_if<std::is_enum<T>::value>::type* = 0)
+{
+    return (v >= static_cast<I>(T::First_)
+            && v <= static_cast<I>(T::Last_));
+}
+
+template <typename T, typename FnT, typename I>
+static bool call_if_convertible
+(I v, FnT fn, typename std::enable_if<std::is_enum<T>::value>::type* = 0)
+{
+    bool res = can_convert<T>(v);
+    if (res)
+        fn(static_cast<T>(v));
+    return res;
+}
+
 }
 
 template <typename ... A>

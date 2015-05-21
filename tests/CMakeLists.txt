@@ -6,7 +6,7 @@ set(CMAKE_AUTOMOC TRUE)
 find_package(Qt5Core REQUIRED)
 
 testrunner_project(qtaround)
-set(UNIT_TESTS os dbus misc mt)
+set(UNIT_TESTS os dbus misc mt debug)
 
 MACRO(UNIT_TEST _name)
   set(_exe_name test_${_name})
