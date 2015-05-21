@@ -8,6 +8,7 @@
  * @par License: LGPL 2.1 http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
  */
 
+#include <cor/util.hpp>
 #include "error.hpp"
 
 #include <QVariant>
@@ -164,8 +165,10 @@ T unbox(std::unique_ptr<T> p)
     return std::move(*p);
 }
 
+/// deprecated
 template <typename T> struct StructTraits;
 
+/// deprecated
 template <typename FieldsT>
 struct Struct
 {
@@ -215,6 +218,7 @@ constexpr size_t count(Args &&...)
     return sizeof...(Args);
 }
 
+/// deprecated
 #define STRUCT_NAMES(Id, id_names...)           \
     template <Id i>                             \
     static char const * name()                                    \
@@ -227,6 +231,7 @@ constexpr size_t count(Args &&...)
 
 namespace qtaround { namespace debug {
 
+/// deprecated
 template <size_t N>
 struct StructDump
 {
@@ -242,6 +247,7 @@ struct StructDump
     }
 };
 
+/// deprecated
 template <>
 struct StructDump<1>
 {
@@ -256,6 +262,7 @@ struct StructDump<1>
     }
 };
 
+/// deprecated
 template <typename FieldsT>
 QDebug & operator <<(QDebug &d, Struct<FieldsT> const &v)
 {
@@ -266,6 +273,23 @@ QDebug & operator <<(QDebug &d, Struct<FieldsT> const &v)
 }
 
 }}
+
+template <typename FieldsT, typename... ElementsT>
+QDebug & operator <<(QDebug &dst, Record<FieldsT, ElementsT...> const &v)
+{
+    static constexpr auto index = static_cast<size_t>(FieldsT::Last_);
+    dst << "("; RecordDump<index>::out(dst, v); dst << ")";
+    return dst;
+}
+
+template <typename FieldsT, typename... ElementsT>
+QString loggable(Record<FieldsT, ElementsT...> const &v)
+{
+    QString res;
+    QDebug dst(res);
+    dst << v;
+    return res;
+}
 
 namespace qtaround { namespace util {
 
