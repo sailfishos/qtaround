@@ -11,7 +11,7 @@ add_library(qtaround SHARED
 qt5_use_modules(qtaround Core)
 target_link_libraries(qtaround ${COR_LIBRARIES})
 set_target_properties(qtaround PROPERTIES
-  SOVERSION 1
+  SOVERSION 2
   VERSION ${VERSION}
   )
 install(TARGETS qtaround DESTINATION ${DST_LIB})
