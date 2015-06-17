@@ -96,7 +96,8 @@ void Process::check_error(QVariantMap const &error_info)
                        , {"rc", rc()}
                        , {"stderr", stderr()}
                        , {"stdout", stdout()}
-                       , {"info", errorInfo()}};
+                       , {"info", errorInfo()}
+                       , {"pwd", ps->workingDirectory()}};
     err.unite(error_info);
     error::raise(err);
 }
