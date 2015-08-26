@@ -5,7 +5,7 @@ Name: qtaround
 Version: 0.0.0
 Release: 1
 License: LGPL21
-Group: Development/Liraries
+Group: System/Libraries
 URL: https://github.com/nemomobile/qtaround
 Source0: %{name}-%{version}.tar.bz2
 BuildRequires: cmake >= 2.8
@@ -19,10 +19,19 @@ Requires(postun): /sbin/ldconfig
 QtAround library used to port the-vault to C++. Mostly consists of
 thin wrappers around Qt classes and standard Linux utilities.
 
+%package -n libqtaround2
+Group: System/Libraries
+Summary: QtAround library
+Provides: libqtaround = %{version}-%{release}
+Obsoletes: libqtaround < %{version}
+%description -n libqtaround2
+%summary
+
 %package devel
 Summary: QtAround library
 Group: Development/Libraries
-Requires: qtaround = %{version}-%{release}
+Requires: libqtaround2 = %{version}
+Requires: pkgconfig(cor) >= 0.1.17
 %description devel
 QtAround library used to port the-vault to C++. Mostly consists of
 thin wrappers around Qt classes and standard Linux utilities.
@@ -30,7 +39,7 @@ thin wrappers around Qt classes and standard Linux utilities.
 %package dbus
 Summary: QtAround D-Bus wrappers
 Group: Development/Libraries
-Requires: qtaround = %{version}-%{release}
+Requires: libqtaround2 = %{version}
 BuildRequires: pkgconfig(Qt5DBus) >= 5.2.0
 %description dbus
 QtAround library: D-Bus wrappers
@@ -38,9 +47,9 @@ QtAround library: D-Bus wrappers
 %package dbus-devel
 Summary: QtAround D-Bus development files
 Group: Development/Libraries
-Requires: qtaround = %{version}-%{release}
-Requires: qtaround-dbus = %{version}-%{release}
-Requires: qtaround-devel = %{version}-%{release}
+Requires: libqtaround2 = %{version}
+Requires: qtaround-dbus = %{version}
+Requires: qtaround-devel = %{version}
 %description dbus-devel
 %{summary}
 
@@ -48,8 +57,8 @@ Requires: qtaround-devel = %{version}-%{release}
 Summary:    Tests for qtaround
 License:    LGPLv2.1
 Group:      System Environment/Libraries
-Requires:   %{name} = %{version}-%{release}
-Requires:   %{name}-dbus = %{version}-%{release}
+Requires:   %{name} = %{version}
+Requires:   %{name}-dbus = %{version}
 %if %{undefined suse_version}
 Requires:   btrfs-progs
 %else
@@ -72,12 +81,14 @@ rm -rf $RPM_BUILD_ROOT
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files
+%files -n libqtaround2
 %defattr(-,root,root,-)
-%{_libdir}/libqtaround.so*
+%{_libdir}/libqtaround.so.2
+%{_libdir}/libqtaround.so.%{version}
 
 %files devel
 %defattr(-,root,root,-)
+%{_libdir}/libqtaround.so
 %{_libdir}/pkgconfig/qtaround.pc
 %{_libdir}/pkgconfig/qtaround-1.pc
 %{_includedir}/qtaround/debug.hpp
@@ -91,10 +102,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %files dbus
 %defattr(-,root,root,-)
-%{_libdir}/libqtaround-dbus.so*
+%{_libdir}/libqtaround-dbus.so.0
+%{_libdir}/libqtaround-dbus.so.%{version}
 
 %files dbus-devel
 %defattr(-,root,root,-)
+%{_libdir}/libqtaround-dbus.so
 %{_libdir}/pkgconfig/qtaround-dbus.pc
 %{_includedir}/qtaround/dbus.hpp
 
@@ -102,8 +115,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 /opt/tests/qtaround/*
 
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%post -n libqtaround2 -p /sbin/ldconfig
+%postun -n libqtaround2 -p /sbin/ldconfig
 
 %post dbus -p /sbin/ldconfig
 %postun dbus -p /sbin/ldconfig
