@@ -16,9 +16,12 @@ namespace qtaround {
 namespace error {
 const char* Error::what() const noexcept(true)
 {
-    if (s.isEmpty())
-        s = dump(m);
-    return s.toUtf8();
+    if (!cstr) {
+        if (s.isEmpty())
+            s = dump(m);
+        cstr = strdup(s.toUtf8());
+    }
+    return cstr;
 }
 
 QDebug operator << (QDebug dst, error::Error const &src)

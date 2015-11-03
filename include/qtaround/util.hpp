@@ -8,6 +8,7 @@
  * @par License: LGPL 2.1 http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
  */
 
+#include <cor/util.hpp>
 #include "error.hpp"
 
 #include <QVariant>
@@ -124,6 +125,24 @@ QString get(QVariant const &from)
     return from.toString();
 }
 
+template <typename T, typename I>
+static bool can_convert
+(I v, typename std::enable_if<std::is_enum<T>::value>::type* = 0)
+{
+    return (v >= static_cast<I>(T::First_)
+            && v <= static_cast<I>(T::Last_));
+}
+
+template <typename T, typename FnT, typename I>
+static bool call_if_convertible
+(I v, FnT fn, typename std::enable_if<std::is_enum<T>::value>::type* = 0)
+{
+    bool res = can_convert<T>(v);
+    if (res)
+        fn(static_cast<T>(v));
+    return res;
+}
+
 }
 
 template <typename ... A>
@@ -146,8 +165,10 @@ T unbox(std::unique_ptr<T> p)
     return std::move(*p);
 }
 
+/// deprecated
 template <typename T> struct StructTraits;
 
+/// deprecated
 template <typename FieldsT>
 struct Struct
 {
@@ -197,6 +218,7 @@ constexpr size_t count(Args &&...)
     return sizeof...(Args);
 }
 
+/// deprecated
 #define STRUCT_NAMES(Id, id_names...)           \
     template <Id i>                             \
     static char const * name()                                    \
@@ -209,6 +231,7 @@ constexpr size_t count(Args &&...)
 
 namespace qtaround { namespace debug {
 
+/// deprecated
 template <size_t N>
 struct StructDump
 {
@@ -224,6 +247,7 @@ struct StructDump
     }
 };
 
+/// deprecated
 template <>
 struct StructDump<1>
 {
@@ -238,6 +262,7 @@ struct StructDump<1>
     }
 };
 
+/// deprecated
 template <typename FieldsT>
 QDebug & operator <<(QDebug &d, Struct<FieldsT> const &v)
 {
@@ -248,6 +273,23 @@ QDebug & operator <<(QDebug &d, Struct<FieldsT> const &v)
 }
 
 }}
+
+template <typename FieldsT, typename... ElementsT>
+QDebug & operator <<(QDebug &dst, Record<FieldsT, ElementsT...> const &v)
+{
+    static constexpr auto index = static_cast<size_t>(FieldsT::Last_);
+    dst << "("; RecordDump<index>::out(dst, v); dst << ")";
+    return dst;
+}
+
+template <typename FieldsT, typename... ElementsT>
+QString loggable(Record<FieldsT, ElementsT...> const &v)
+{
+    QString res;
+    QDebug dst(res);
+    dst << v;
+    return res;
+}
 
 namespace qtaround { namespace util {
 

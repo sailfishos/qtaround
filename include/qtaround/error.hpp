@@ -26,12 +26,13 @@ QString dump(T && t)
 class Error : public std::exception
 {
 public:
-    Error(QVariantMap const &from) : m(from) {}
-    virtual ~Error() noexcept(true) {}
+    Error(QVariantMap const &from) : m(from), cstr(nullptr) {}
+    virtual ~Error() noexcept(true) { if (cstr) free(cstr); }
     virtual const char* what() const noexcept(true);
 
     QVariantMap m;
     mutable QString s;
+    mutable char *cstr;
 };
 
 QDebug operator << (QDebug dst, error::Error const &src);
