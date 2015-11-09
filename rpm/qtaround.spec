@@ -57,7 +57,7 @@ Requires: qtaround-devel = %{version}
 Summary:    Tests for qtaround
 License:    LGPLv2.1
 Group:      System Environment/Libraries
-Requires:   %{name} = %{version}
+Requires:   libqtaround2 = %{version}
 Requires:   %{name}-dbus = %{version}
 %if %{undefined suse_version}
 Requires:   btrfs-progs
