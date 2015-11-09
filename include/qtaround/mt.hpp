@@ -42,6 +42,7 @@ public:
     bool sendEvent(QEvent *);
     void quit();
     bool quitSync(unsigned long timeout);
+    bool wait(unsigned long timeout);
 
 signals:
     void finished(Actor*);

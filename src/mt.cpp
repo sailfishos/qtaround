@@ -9,6 +9,7 @@
 #include <qtaround/mt.hpp>
 #include <mutex>
 #include <condition_variable>
+#include <vector>
 
 namespace qtaround { namespace mt {
 
@@ -50,6 +51,7 @@ public:
     bool sendEvent(QEvent *);
 
     bool quitSync(unsigned long timeout);
+    bool waitIfOtherThread(unsigned long timeout);
 
 private:
     std::shared_ptr<QObject> obj_;
@@ -94,6 +96,11 @@ bool Actor::postEvent(QEvent *e)
 bool Actor::sendEvent(QEvent *e)
 {
     return impl_->sendEvent(e);
+}
+
+bool Actor::wait(unsigned long timeout)
+{
+    return impl_->waitIfOtherThread(timeout);
 }
 
 ActorImpl::~ActorImpl()
@@ -146,9 +153,16 @@ bool ActorImpl::quitSync(unsigned long timeout)
         return true;
 
     quit();
+    return waitIfOtherThread(timeout);
+}
+
+bool ActorImpl::waitIfOtherThread(unsigned long timeout)
+{
+    if (!isRunning())
+        return true;
+
     if (this != QThread::currentThread())
         if (!wait(timeout)) {
-            debug::warning("Timeout on sync quit");
             return false;
         }
     return true;
@@ -198,11 +212,17 @@ static std::once_flag monitor_once_;
 
 void deleteOnApplicationExit(ActorHandle h)
 {
-    auto app = QCoreApplication::instance();
-    std::call_once(monitor_once_, [app]() {
-            monitor_ = new AppExitMonitor(app);
+    std::call_once(monitor_once_, []() {
+            auto app = QCoreApplication::instance();
+            if (app)
+                monitor_ = new AppExitMonitor(app);
+            else
+                debug::warning("No QCoreApplication == no AppExitMonitor");
         });
-    monitor_->insert(h);
+    if (monitor_)
+        monitor_->insert(h);
+    else
+        debug::warning("No AppExitMonitor, don't track", h.get());
 }
 
 AppExitMonitor::AppExitMonitor(QCoreApplication *app)
@@ -217,7 +237,9 @@ void AppExitMonitor::insert(ActorHandle p)
 {
     auto id = reinterpret_cast<intptr_t>(p.get());
     actors_.insert(std::make_pair(id, std::weak_ptr<Actor>(p)));
-    connect(p.get(), &Actor::finished, this, &AppExitMonitor::actorFinished);
+    connect(p.get(), &Actor::finished
+            , this, &AppExitMonitor::actorFinished
+            , Qt::QueuedConnection);
 }
 
 void AppExitMonitor::actorFinished(Actor *p)
@@ -228,11 +250,25 @@ void AppExitMonitor::actorFinished(Actor *p)
 
 void AppExitMonitor::beforeAppQuit()
 {
+    typedef std::vector<std::shared_ptr<Actor> > actors_type;
+    actors_type left_actors;
     for (auto &kv : actors_) {
         auto actor = kv.second.lock();
         if (actor)
-            actor->quitSync(10000); // random timeout
+            left_actors.emplace_back(actor);
     }
+    for (auto &actor : left_actors)
+        actor->quit();
+
+    actors_type delayed_actors;
+    for (auto &actor : left_actors)
+        if (!actor->wait(1)) // or maybe even 0?
+            delayed_actors.emplace_back(std::move(actor));
+
+    left_actors.clear();
+    for (auto &actor : delayed_actors)
+        if (!actor->wait(10000))
+            debug::warning("Timeout quiting from actor", actor.get());
 }
 
 }}
