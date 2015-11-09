@@ -116,11 +116,17 @@ ActorImpl::~ActorImpl()
 
 void ActorImpl::run()
 {
-    auto ctx = std::static_pointer_cast<ActorContext>(std::move(obj_));
-    obj_ = ctx->ctor_();
-    ctx->notify_(std::move(ctx->actor_));
-    exec();
-    obj_.reset();
+    try {
+        auto ctx = std::static_pointer_cast<ActorContext>(std::move(obj_));
+        obj_ = ctx->ctor_();
+        ctx->notify_(std::move(ctx->actor_));
+        exec();
+        obj_.reset();
+    } catch (std::exception const &e) {
+        debug::critical("Uncaught exception in thread", this, ":", e.what());
+    } catch (...) {
+        debug::critical("Uncaught exception in", this, ", exiting thread");
+    }
 }
 
 bool ActorImpl::postEvent(QEvent *e)
