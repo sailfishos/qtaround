@@ -28,7 +28,7 @@ namespace qtaround { namespace debug {
 enum class Level { First_ = 1, Debug = First_, Info, Warning, Error
         , Critical, Last_ = Critical };
 /// compatible with syslog priorities
-enum class Priority { First_ = 0, Emerg = First_, Alert, Crit
+enum class Priority { First_ = 0, Emerg = First_, Always = Emerg, Alert, Crit
         , Err, Warning, Notice, Info
         , Debug, Last_ = Debug };
 
@@ -51,6 +51,7 @@ extern template struct Traits<Priority::Err>;
 extern template struct Traits<Priority::Crit>;
 extern template struct Traits<Priority::Alert>;
 extern template struct Traits<Priority::Emerg>;
+extern template struct Traits<Priority::Always>;
 
 static inline void print(QDebug &&d)
 {
