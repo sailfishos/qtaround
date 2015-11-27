@@ -44,7 +44,7 @@ int get_priority(char const *name)
         {"Err", Priority::Err},
         {"Crit", Priority::Crit},
         {"Alert", Priority::Alert},
-        {"Emerg", Priority::Emerg},
+        {"Emerg", Priority::Emerg}
     };
     auto res = -1;
     if (name) {
@@ -117,6 +117,7 @@ template struct Traits<Priority::Err>;
 template struct Traits<Priority::Crit>;
 template struct Traits<Priority::Alert>;
 template struct Traits<Priority::Emerg>;
+template struct Traits<Priority::Uncond>;
 
 template <>
 QDebug Traits<Priority::Debug>::stream()
@@ -164,6 +165,12 @@ template <>
 QDebug Traits<Priority::Emerg>::stream()
 {
     return logger.critical();
+}
+
+template <>
+QDebug Traits<Priority::Uncond>::stream()
+{
+    return logger.debug();
 }
 
 void level(Level level)

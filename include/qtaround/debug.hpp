@@ -30,7 +30,7 @@ enum class Level { First_ = 1, Debug = First_, Info, Warning, Error
 /// compatible with syslog priorities
 enum class Priority { First_ = 0, Emerg = First_, Alert, Crit
         , Err, Warning, Notice, Info
-        , Debug, Last_ = Debug };
+        , Debug, Uncond, Last_ = Uncond };
 
 void set_max_priority(Priority);
 Priority get_priority(Level);
@@ -51,6 +51,7 @@ extern template struct Traits<Priority::Err>;
 extern template struct Traits<Priority::Crit>;
 extern template struct Traits<Priority::Alert>;
 extern template struct Traits<Priority::Emerg>;
+extern template struct Traits<Priority::Uncond>;
 
 static inline void print(QDebug &&d)
 {
@@ -74,7 +75,7 @@ void print(QDebug &&d, T &&v1, A&& ...args)
 template <typename ... A>
 void print(A&& ...args)
 {
-    Traits<Priority::Emerg> ctx;
+    Traits<Priority::Uncond> ctx;
     return print(ctx.stream(), std::forward<A>(args)...);
 }
 
