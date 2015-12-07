@@ -4,7 +4,7 @@ Summary: QtAround library
 Name: qtaround
 Version: 0.0.0
 Release: 1
-License: LGPL21
+License: LGPLv2.1
 Group: System/Libraries
 URL: https://github.com/nemomobile/qtaround
 Source0: %{name}-%{version}.tar.bz2
@@ -20,7 +20,6 @@ QtAround library used to port the-vault to C++. Mostly consists of
 thin wrappers around Qt classes and standard Linux utilities.
 
 %package -n libqtaround2
-Group: System/Libraries
 Summary: QtAround library
 Provides: libqtaround = %{version}-%{release}
 Obsoletes: libqtaround < %{version}
@@ -29,7 +28,6 @@ Obsoletes: libqtaround < %{version}
 
 %package devel
 Summary: QtAround library
-Group: Development/Libraries
 Requires: libqtaround2 = %{version}
 Requires: pkgconfig(cor) >= 0.1.17
 %description devel
@@ -38,7 +36,6 @@ thin wrappers around Qt classes and standard Linux utilities.
 
 %package dbus
 Summary: QtAround D-Bus wrappers
-Group: Development/Libraries
 Requires: libqtaround2 = %{version}
 BuildRequires: pkgconfig(Qt5DBus) >= 5.2.0
 %description dbus
@@ -46,7 +43,6 @@ QtAround library: D-Bus wrappers
 
 %package dbus-devel
 Summary: QtAround D-Bus development files
-Group: Development/Libraries
 Requires: libqtaround2 = %{version}
 Requires: qtaround-dbus = %{version}
 Requires: qtaround-devel = %{version}
@@ -55,8 +51,6 @@ Requires: qtaround-devel = %{version}
 
 %package tests
 Summary:    Tests for qtaround
-License:    LGPLv2.1
-Group:      System Environment/Libraries
 Requires:   %{name} = %{version}
 Requires:   %{name}-dbus = %{version}
 %if %{undefined suse_version}
