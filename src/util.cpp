@@ -11,6 +11,8 @@
 #include <QString>
 #include <QMap>
 
+#include <cmath>
+
 namespace qtaround {
 
 namespace error {
