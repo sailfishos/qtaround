@@ -1,12 +1,12 @@
 %{!?cmake_install: %global cmake_install make install DESTDIR=%{buildroot}}
 
 Summary: QtAround library
-Name: qtaround
+Name:    qtaround
 Version: 0.0.0
 Release: 1
-License: LGPLv2.1
-Group: System/Libraries
-URL: https://github.com/nemomobile/qtaround
+License: LGPLv2
+Group:   System/Libraries
+URL:     https://git.sailfishos.org/mer-core/qtaround
 Source0: %{name}-%{version}.tar.bz2
 BuildRequires: cmake >= 2.8
 BuildRequires: pkgconfig(cor) >= 0.1.17
