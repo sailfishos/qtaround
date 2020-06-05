@@ -14,6 +14,7 @@ BuildRequires: pkgconfig(tut) >= 0.0.3
 BuildRequires: pkgconfig(Qt5Core) >= 5.2.0
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
+ExcludeArch:   aarch64
 
 %description
 QtAround library used to port the-vault to C++. Mostly consists of
